@@ -88,4 +88,11 @@ record 'a group =
   unit :: "'a"
 
 
+definition valid_group :: "'a group \<Rightarrow> bool" where
+"valid_group G \<longleftrightarrow>( 
+(\<forall>x \<in> carrier G. \<exists>y \<in> carrier G. mult G x y \<in> carrier G)
+\<and> (\<forall>z \<in> carrier G. (mult G z (unit G)) =  z)
+\<and> (\<forall>x \<in> carrier G. \<forall>y \<in> carrier G. (mult G x y) = (mult G y x))
+)" text "1: Inverse, 2: Einselement, 3: Assoziativgesetz"
+
 end
