@@ -82,10 +82,4 @@ text \<open>Mengenlehre kann vorausgesetzt werden.
 
 section \<open>Versuch der Formalisierung von van der Waerden\<close>
 
-record 'a group =
-  carrier :: "'a set"
-  mult :: "'a \<Rightarrow> 'a \<Rightarrow> 'a"
-  unit :: "'a"
-
-
 end
