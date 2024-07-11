@@ -82,10 +82,29 @@ text \<open>Mengenlehre kann vorausgesetzt werden.
 
 section \<open>Versuch der Formalisierung von van der Waerden\<close>
 
-record 'a group =
-  carrier :: "'a set"
-  mult :: "'a \<Rightarrow> 'a \<Rightarrow> 'a"
-  unit :: "'a"
+
+text \<open>Ein Monoid ist eine Menge, mit einem damit asoziierten Operator und einem Einheitselement\<close>
+record 'a monoid  = 
+  carrier :: "'a set" (*im vorherigen Text wurde gemeint, dass wir 'a partial_object verwenden sollten. Kp, was der Unterschied ist*)
+  mult :: "'a \<Rightarrow> 'a \<Rightarrow> 'a" (infixl "\<times>" 80)
+  unit :: "'a" ("e")
+
+locale monoid =
+  fixes M :: "'a monoid"
+  assumes m_closed: "\<lbrakk>x \<in> carrier M; y \<in> carrier M\<rbrakk> \<comment> \<open>Zusammensetzungsvorschrift\<close>
+    \<Longrightarrow> mult M x y \<in> carrier M" 
+    and m_assoc: "\<lbrakk>x \<in> carrier M; y \<in> carrier M; z \<in> carrier M\<rbrakk> \<comment> \<open>Assoziativgesetz\<close>
+    \<Longrightarrow> mult M (mult M x y) z = mult M x (mult M y z)"
+
+    and m_identity: "unit M \<in> carrier M" \<comment> \<open>Einselelement\<close>
+    and m_identity_l: "x \<in> carrier M \<Longrightarrow> mult M (unit M) x = x" 
+    and m_identity_r: "x \<in> carrier M \<Longrightarrow> mult M x (unit M) = x"
+
+definition my_mult :: "nat \<Rightarrow> nat \<Rightarrow> nat" where
+  "my_mult y x = x*y"
+
+definition my_monoid :: "nat monoid" where
+ "my_monoid \<equiv> \<lparr>carrier = {123, 3}, mult = my_mult, unit = 0\<rparr>"
 
 
 definition valid_group :: "'a group \<Rightarrow> bool" where
