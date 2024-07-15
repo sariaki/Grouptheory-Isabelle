@@ -98,9 +98,11 @@ locale monoid =
     and identity_l [simp]: "x \<in> carrier G \<Longrightarrow> mult G (unit G) x = x" 
     and identity_r [simp]: "x \<in> carrier G \<Longrightarrow> mult G x (unit G) = x"
 
-text \<open>Eine Gruppe ist ein Monoid, wo jedes Element ein passendes Inverses hat, sodass @{text "x * x^{-1} = e"}\<close>
+    and not_empty: "carrier G \<noteq> {}"
+
+text \<open>Eine Gruppe ist ein Monoid, wo jedes Element ein passendes Inverses hat, sodass @{text "x \<times> x\<inverse>"}\<close>
 definition inverse :: "('a, 'b) monoid_scheme \<Rightarrow> 'a \<Rightarrow> 'a" where
-  "inverse G x = (THE y. y \<in> carrier G \<and> (mult G y x = unit G)) " (*Siehe S. 92*)
+  "inverse G x = (THE y. y \<in> carrier G \<and> (mult G y x = unit G)) " (*Siehe Isabelle/HOL S. 92*)
 
 definition group_inverse_elements :: "('a, 'b) monoid_scheme \<Rightarrow> 'a set" where
   "group_inverse_elements G = {y. y \<in> carrier G \<and> (\<exists>x. y = inverse G x)}"
@@ -108,6 +110,19 @@ definition group_inverse_elements :: "('a, 'b) monoid_scheme \<Rightarrow> 'a se
 locale group = monoid +
   assumes group_inverse_all: "carrier G = group_inverse_elements G"
   and group_inverse_l: "x \<in> carrier G \<Longrightarrow> mult G (inverse G x) x = unit G"
+
+definition my_add :: "nat \<Rightarrow> nat \<Rightarrow> nat" where
+  "my_add x y = x+y"
+
+interpretation my_group: group "\<lparr>carrier = UNIV, mult=my_add, unit=0\<rparr>"
+  apply(unfold_locales)
+         apply(auto)
+      apply(simp add: my_add_def)
+     apply(simp add: my_add_def)
+    apply(simp add: my_add_def)
+  apply()
+
+
 
 (*
 definition (in group) valid_group :: "'a group \<Rightarrow> bool" where
