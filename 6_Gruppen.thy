@@ -82,7 +82,6 @@ text \<open>Mengenlehre kann vorausgesetzt werden.
 
 section \<open>Versuch der Formalisierung von van der Waerden\<close>
 
-
 text \<open>Ein Monoid ist eine Menge, mit einem damit asoziierten Operator und einem Einheitselement\<close>
 record 'a monoid  = "'a partial_object" +
   mult :: "'a \<Rightarrow> 'a \<Rightarrow> 'a"
@@ -90,30 +89,32 @@ record 'a monoid  = "'a partial_object" +
 
 locale monoid =
   fixes G (structure)
-  assumes monoid_closed: "\<lbrakk>x \<in> carrier G; y \<in> carrier G\<rbrakk> \<comment> \<open>Zusammensetzungsvorschrift\<close>
+  assumes is_closed: "\<lbrakk>x \<in> carrier G; y \<in> carrier G\<rbrakk> \<comment> \<open>Zusammensetzungsvorschrift\<close>
     \<Longrightarrow> mult G x y \<in> carrier G" 
-    and monoid_assoc: "\<lbrakk>x \<in> carrier G; y \<in> carrier G; z \<in> carrier G\<rbrakk> \<comment> \<open>Assoziativgesetz\<close>
+    and is_assoc: "\<lbrakk>x \<in> carrier G; y \<in> carrier G; z \<in> carrier G\<rbrakk> \<comment> \<open>Assoziativgesetz\<close>
     \<Longrightarrow> mult G (mult G x y) z = mult G x (mult G y z)"
 
-    and monoid_identity: "unit G \<in> carrier G" \<comment> \<open>Einselement\<close>
-    and monoid_identity_l [simp]: "x \<in> carrier G \<Longrightarrow> mult G (unit G) x = x" 
-    and monoid_identity_r [simp]: "x \<in> carrier G \<Longrightarrow> mult G x (unit G) = x"
+    and has_identity: "unit G \<in> carrier G" \<comment> \<open>Einselement\<close>
+    and identity_l [simp]: "x \<in> carrier G \<Longrightarrow> mult G (unit G) x = x" 
+    and identity_r [simp]: "x \<in> carrier G \<Longrightarrow> mult G x (unit G) = x"
 
-record 'a group = "'a monoid" +
-  inv :: "'a \<Rightarrow> 'a"
+text \<open>Eine Gruppe ist ein Monoid, wo jedes Element ein passendes Inverses hat, sodass @{text "x * x^{-1} = e"}\<close>
+definition inverse :: "('a, 'b) monoid_scheme \<Rightarrow> 'a \<Rightarrow> 'a" where
+  "inverse G x = (THE y. y \<in> carrier G \<and> (mult G y x = unit G)) " (*Siehe S. 92*)
 
-definition (in group) group_inverse_elements :: "'a group \<Rightarrow> 'a set" where
-  "group_inverse_elements G = {y. y \<in> carrier G \<and> (\<exists> x. y = inv G x)}"
+definition group_inverse_elements :: "('a, 'b) monoid_scheme \<Rightarrow> 'a set" where
+  "group_inverse_elements G = {y. y \<in> carrier G \<and> (\<exists>x. y = inverse G x)}"
 
 locale group = monoid +
   assumes group_inverse_all: "carrier G = group_inverse_elements G"
-  and group_inverse_l: "x \<in> carrier G \<Longrightarrow> mult G (inv x) x = unit G" (*wtf?*)
+  and group_inverse_l: "x \<in> carrier G \<Longrightarrow> mult G (inverse G x) x = unit G"
 
+(*
 definition (in group) valid_group :: "'a group \<Rightarrow> bool" where
 "valid_group G \<longleftrightarrow>( 
 (\<forall>x \<in> carrier G. \<exists>y \<in> carrier G. mult G x y \<in> carrier G)
 \<and> (\<forall>z \<in> carrier G. (mult G z (unit G)) =  z)
 \<and> (\<forall>x \<in> carrier G. \<forall>y \<in> carrier G. (mult G x y) = (mult G y x))
 )" text "1: Geschlossenheit, 2: Einselement, 3: Assoziativgesetz"
-
+*)
 end
