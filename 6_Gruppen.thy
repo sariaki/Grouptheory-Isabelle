@@ -81,9 +81,6 @@ text \<open>Mengenlehre kann vorausgesetzt werden.
   bestimmt sind und mehr Freiheit bei der Umsetzung besteht.\<close>
 
 section \<open>Versuch der Formalisierung von van der Waerden\<close>
-
-text \<open>Ein Monoid ist eine Menge, mit einem damit asoziierten Operator und einem Einheitselement\<close>
-
 record 'a group =
   carrier :: "'a set"
   mult :: "'a \<Rightarrow> 'a \<Rightarrow> 'a"
@@ -91,130 +88,27 @@ record 'a group =
 
 definition
   inverse :: "('a, 'b) group_scheme \<Rightarrow> 'a \<Rightarrow> 'a"
-  where "inverse G x = (THE y. y \<in> carrier G \<and> mult G x y = unit G \<and> mult G y x = unit G)"
+  where "inverse G x = (THE y. y \<in> carrier G \<and> mult G y x = unit G)" 
+\<comment> \<open>In \<section>9. wird erstmal von einem linksseitigen inversem Element gesprochen\<close>
+
+definition group_inverse_elements :: "('a, 'b) group_scheme \<Rightarrow> 'a set" where
+  "group_inverse_elements G = {y. y \<in> carrier G \<and> (\<exists>x. y = inverse G x)}"
 
 locale group =
   fixes G (structure)
-  assumes is_closed: "\<lbrakk>x \<in> carrier G; y \<in> carrier G\<rbrakk> \<comment> \<open>Zusammensetzungsvorschrift\<close>
+  assumes not_empty: "carrier G \<noteq> {}"
+
+  and is_closed: "\<lbrakk>x \<in> carrier G; y \<in> carrier G\<rbrakk> \<comment> \<open>Zusammensetzungsvorschrift\<close>
     \<Longrightarrow> mult G x y \<in> carrier G" 
-    and is_assoc: "\<lbrakk>x \<in> carrier G; y \<in> carrier G; z \<in> carrier G\<rbrakk> \<comment> \<open>Assoziativgesetz\<close>
+
+  and is_assoc: "\<lbrakk>x \<in> carrier G; y \<in> carrier G; z \<in> carrier G\<rbrakk> \<comment> \<open>Assoziativgesetz\<close>
     \<Longrightarrow> mult G (mult G x y) z = mult G x (mult G y z)"
-    and has_identity: "unit G \<in> carrier G" \<comment> \<open>Einselement\<close>
-    and identity_l [simp]: "x \<in> carrier G \<Longrightarrow> mult G (unit G) x = x"
-    and identity_r [simp]: "x \<in> carrier G \<Longrightarrow> mult G x (unit G) = x"
-    and not_empty: "carrier G \<noteq> {}"
-    and has_inverse: "x \<in> carrier G \<Longrightarrow> inverse G x \<in> carrier G"
 
+  and has_identity: "unit G \<in> carrier G" \<comment> \<open>Einselement\<close>
+  and identity_l [simp]: "x \<in> carrier G \<Longrightarrow> mult G (unit G) x = x"
 
-definition my_add :: "nat \<Rightarrow> nat \<Rightarrow> nat" where
-  "my_add x y = x+y"
+  and group_inverse_all: "carrier G = group_inverse_elements G" \<comment> \<open>Inverses Element\<close>
+  and has_inverse: "x \<in> carrier G \<Longrightarrow> inverse G x \<in> carrier G"
 
-(*
-interpretation my_group: group "\<lparr>carrier = UNIV, mult=my_add, unit=0\<rparr>"
-  apply(unfold_locales)
-         apply(auto)
-      apply(simp add: my_add_def)
-     apply(simp add: my_add_def)
-    apply(simp add: my_add_def)
-    apply(simp add: group_inverse_elements_def) 
-    apply(simp add: inverse_def)
-*)
-
-lemma my_group_not_empty [simp]: "carrier (\<lparr>carrier = {0}, mult = my_add, unit = 0\<rparr>) \<noteq> {}"
-  by auto
-
-lemma my_group_is_closed [simp]: 
-  "\<lbrakk>x \<in> carrier (\<lparr>carrier = {0}, mult = my_add, unit = 0\<rparr>); y \<in> carrier (\<lparr>carrier = {0}, mult = my_add, unit = 0\<rparr>)\<rbrakk> 
-  \<Longrightarrow> my_add x y \<in> carrier (\<lparr>carrier = {0}, mult = my_add, unit = 0\<rparr>)"
-  by (auto simp add: my_add_def)
-
-lemma my_group_is_assoc [simp]: 
-  "\<lbrakk>x \<in> carrier (\<lparr>carrier = {0}, mult = my_add, unit = 0\<rparr>); y \<in> carrier (\<lparr>carrier = {0}, mult = my_add, unit = 0\<rparr>); z \<in> carrier (\<lparr>carrier = {0}, mult = my_add, unit = 0\<rparr>)\<rbrakk> 
-  \<Longrightarrow> my_add (my_add x y) z = my_add x (my_add y z)"
-  by (auto simp add: my_add_def)
-
-lemma my_group_has_identity [simp]: "unit (\<lparr>carrier = {0}, mult = my_add, unit = 0\<rparr>) \<in> carrier (\<lparr>carrier = {0}, mult = my_add, unit = 0\<rparr>)"
-  by auto
-
-lemma my_group_identity_l [simp]: 
-  "x \<in> carrier (\<lparr>carrier = {0}, mult = my_add, unit = 0\<rparr>) \<Longrightarrow> my_add (unit (\<lparr>carrier = {0}, mult = my_add, unit = 0\<rparr>)) x = x"
-  by (auto simp add: my_add_def)
-
-lemma my_group_identity_r [simp]: 
-  "x \<in> carrier (\<lparr>carrier = {0}, mult = my_add, unit = 0\<rparr>) \<Longrightarrow> my_add x (unit (\<lparr>carrier = {0}, mult = my_add, unit = 0\<rparr>)) = x"
-  by (auto simp add: my_add_def)
-
-lemma my_group_inverse_l [simp]: 
-  "x \<in> carrier (\<lparr>carrier = {0}, mult = my_add, unit = 0\<rparr>) \<Longrightarrow> my_add (inverse (\<lparr>carrier = {0}, mult = my_add, unit = 0\<rparr>) x) x = unit (\<lparr>carrier = {0}, mult = my_add, unit = 0\<rparr>)"
-  by (auto simp add: inverse_def my_add_def)
-
-lemma my_group_inverse_r [simp]: 
-  "x \<in> carrier (\<lparr>carrier = {0}, mult = my_add, unit = 0\<rparr>) \<Longrightarrow> my_add x (inverse (\<lparr>carrier = {0}, mult = my_add, unit = 0\<rparr>) x) = unit (\<lparr>carrier = {0}, mult = my_add, unit = 0\<rparr>)"
-  by (auto simp add: inverse_def my_add_def)
-
-lemma ex_x_the_y: "(THE y. y = 0 \<and> x = 0) = 0 \<Longrightarrow> \<exists>x. (THE y. y = 0 \<and> x = 0) = 0"
-proof -
-  assume "(THE y. y = 0 \<and> x = 0) = 0"
-  then have "(THE y. y = 0 \<and> 0 = 0) = 0" by simp
-  then have "0 = 0" by (simp add: the_equality)
-  then show "\<exists>x. (THE y. y = 0 \<and> x = 0) = 0"
-    by auto
-qed
-
-
-lemma fml: "y = 0 \<and> (\<exists>x. y = (THE y. y = 0 \<and> my_add y x = 0)) \<Longrightarrow> \<exists>x. (THE y. y = 0 \<and> my_add y x = 0) = 0"
-  by(auto)
-
-lemma my_group_inverse_all [simp]: 
-  "carrier (\<lparr>carrier = {0::nat}, mult = my_add, unit = 0::nat\<rparr>) = group_inverse_elements (\<lparr>carrier = {0}, mult = my_add, unit = 0\<rparr>)"
-proof
-  show "carrier (\<lparr>carrier = {0}, mult = my_add, unit = 0\<rparr>) \<subseteq> group_inverse_elements (\<lparr>carrier = {0}, mult = my_add, unit = 0\<rparr>)"
-  proof
-    fix x::nat
-    assume "x \<in> carrier (\<lparr>carrier = {0}, mult = my_add, unit = 0\<rparr>)"
-    hence "x = 0" by simp
-    hence "inverse \<lparr>carrier = {0::nat}, mult = my_add, unit = 0\<rparr> x = 0"
-      by (simp add: inverse_def my_add_def)
-    hence "0 \<in> group_inverse_elements \<lparr>carrier = {0}, mult = my_add, unit = 0\<rparr>"
-      by (simp add: group_inverse_elements_def inverse_def HOL.exI)
-    thus "x \<in> group_inverse_elements \<lparr>carrier = {0}, mult = my_add, unit = 0\<rparr>"
-      using `x = 0` by simp
-  qed
-
-  show "group_inverse_elements (\<lparr>carrier = {0}, mult = my_add, unit = 0\<rparr>) \<subseteq> carrier (\<lparr>carrier = {0}, mult = my_add, unit = 0\<rparr>)"
-  proof
-    fix y::nat
-    assume "y \<in> group_inverse_elements (\<lparr>carrier = {0}, mult = my_add, unit = 0\<rparr>)"
-    hence "y \<in> carrier (\<lparr>carrier = {0}, mult = my_add, unit = 0\<rparr>) \<and> (\<exists>x. y = inverse \<lparr>carrier = {0}, mult = my_add, unit = 0\<rparr> x)"
-      by (simp add: group_inverse_elements_def inverse_def fml)
-    hence "y = 0" by simp
-    thus "y \<in> carrier (\<lparr>carrier = {0}, mult = my_add, unit = 0\<rparr>)" by simp
-  qed
-qed
-
-lemma hmm: "0 \<in> group_inverse_elements \<lparr>carrier = {0}, mult = my_add, unit = 0\<rparr>"
-  using my_group_inverse_all by auto
-
-lemma hmm2: "\<And>x. x \<in> group_inverse_elements \<lparr>carrier = {0}, mult = my_add, unit = 0\<rparr> \<Longrightarrow> x = 0"
-  using my_group_inverse_all by auto
-
-interpretation my_group: group "\<lparr>carrier = {0::nat}, mult=my_add, unit=0::nat\<rparr>"
-  apply(unfold_locales)
-          apply(auto)
-      apply(simp add: my_add_def)
-     apply(simp add: my_add_def)
-    apply(simp add: my_add_def)
-   apply(simp add: hmm)
-  apply(simp add: hmm2)
-  done
-
-definition valid_group :: "('a, 'b) monoid_scheme \<Rightarrow> bool" where
-"valid_group G \<longleftrightarrow>( 
-(\<forall>x \<in> carrier G. \<exists>y \<in> carrier G. mult G x y \<in> carrier G)
-\<and> (\<forall>z \<in> carrier G. (mult G z (unit G)) =  z)
-\<and> (\<forall>x \<in> carrier G. \<forall>y \<in> carrier G. (mult G x y) = (mult G y x))
-)"
-
-value "valid_group my_group"
 
 end
