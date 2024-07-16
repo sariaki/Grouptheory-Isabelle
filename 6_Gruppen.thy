@@ -111,7 +111,22 @@ locale group =
   and has_inverse: "a \<in> carrier G \<Longrightarrow> inverse G a \<in> carrier G"
 
 definition (in group) is_abelian :: "bool" where
-  "is_abelian = (if (\<forall>a. \<forall>b. mult G a b = mult G a b) then True else False)"
+  "is_abelian = (if (\<forall>a \<in> carrier G. \<forall>b \<in> carrier G. mult G a b = mult G a b) then True else False)"
+
+lemma g_inv_e: "(mult (mult (inverse G a) a) inverse G a) = (inverse G a)"
+
+lemma groupI:
+  fixes G (structure)
+  assumes g_closed:
+      "\<And>x y. \<lbrakk>x \<in> carrier G; y \<in> carrier G\<rbrakk> \<Longrightarrow> mult G x y \<in> carrier G"
+    and unit_closed: "unit G \<in> carrier G"
+    and g_assoc:
+      "\<lbrakk>x \<in> carrier G; y \<in> carrier G; z \<in> carrier G\<rbrakk> \<Longrightarrow> mult G (mult G x y) z = mult G x (mult G y z)"
+    and l_one: "x \<in> carrier G \<Longrightarrow> mult G (unit G) x = x"
+    and not_empty: "carrier G \<noteq> {}"
+    and has_inverse: "x \<in> carrier G \<Longrightarrow> inverse G x \<in> carrier G"
+  shows "group G"
+
 
 
 
