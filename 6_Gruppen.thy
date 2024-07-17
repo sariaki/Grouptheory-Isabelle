@@ -83,85 +83,85 @@ text \<open>Mengenlehre kann vorausgesetzt werden.
 section \<open>Versuch der Formalisierung von van der Waerden\<close>
 record 'a group =
   carrier :: "'a set"
-  mult :: "'a \<Rightarrow> 'a \<Rightarrow> 'a"
-  unit :: "'a" ("e")
-
-definition inverse :: "('a, 'b) group_scheme \<Rightarrow> 'a \<Rightarrow> 'a"
-  where "inverse G a = (THE i. i \<in> carrier G \<and> mult G i a = unit G)" \<comment> \<open>a\<inverse> als Variablenname ist nicht erlaubt in Isabelle\<close>
-\<comment> \<open>In \<section>9. wird eigentlich erstmal nur von einem linksseitigen inversen Element gesprochen\<close>
-
-definition group_inverse_elements :: "('a, 'b) group_scheme \<Rightarrow> 'a set" where
-  "group_inverse_elements G = {a. a \<in> carrier G \<and> (\<exists>b \<in> carrier G. a = inverse G b)}" \<comment> \<open>nicht explizit in v.d.W. Text erwähnt\<close>
+  mult :: "'a \<Rightarrow> 'a \<Rightarrow> 'a" (infixl "\<times>\<index>" 70)
+  unit :: "'a" ("e\<index>")
 
 locale group =
   fixes G (structure)
+  fixes inverse :: "'a \<Rightarrow> 'a" ("inv")
+
   assumes not_empty: "carrier G \<noteq> {}"
 
   and is_closed [intro, simp]: "\<lbrakk>a \<in> carrier G; b \<in> carrier G\<rbrakk> \<comment> \<open>Zusammensetzungsvorschrift\<close>
-    \<Longrightarrow> mult G a b \<in> carrier G" 
+    \<Longrightarrow> (a \<times> b) \<in> carrier G" 
 
   and is_assoc: "\<lbrakk>a \<in> carrier G; b \<in> carrier G; c \<in> carrier G\<rbrakk> \<comment> \<open>Assoziativgesetz\<close>
-    \<Longrightarrow> mult G (mult G a b) c = mult G a (mult G b c)"
+    \<Longrightarrow> mult G (mult G a b) c = mult G a (mult G b c)" \<comment> \<open>Ohne `mult` kriegen wir einen komischen Error\<close>
 
   and has_identity [intro, simp]: "unit G \<in> carrier G" \<comment> \<open>Einselement\<close>
-  and identity_l [simp]: "a \<in> carrier G \<Longrightarrow> mult G (unit G) a = a"
-  and identity_r [simp]: "a \<in> carrier G \<Longrightarrow> mult G a (unit G) = a" \<comment> \<open>In \<section>9. wird eigentlich erstmal nur von einem linksseitigen Einselement gesprochen\<close>
+  and identity_l [simp]: "a \<in> carrier G \<Longrightarrow> e \<times> a = a" 
 
-  and group_inverse_all: "carrier G = group_inverse_elements G" \<comment> \<open>Inverses Element\<close>
-  and has_inverse: "a \<in> carrier G \<Longrightarrow> inverse G a \<in> carrier G"
+  (*and group_inverse_all: "carrier G = group_inverse_elements G" \<comment> \<open>Inverses Element\<close>*)
+  and has_inverse [intro, simp]: "a \<in> carrier G \<Longrightarrow> inv a \<in> carrier G"
+  and inverse_l [simp]: "a \<in> carrier G  \<Longrightarrow> (inv a) \<times> a = e"
 
-definition (in group) is_abelian :: "bool" where
-  "is_abelian = (if (\<forall>a \<in> carrier G. \<forall>b \<in> carrier G. mult G a b = mult G b a) then True else False)"
+begin 
+definition is_abelian :: "bool" where
+  "is_abelian = (if (\<forall>a \<in> carrier G. \<forall>b \<in> carrier G. a \<times> b = b \<times> a) then True else False)"
 
+lemma inverse_r [simp]: "a \<in> carrier G \<Longrightarrow> a \<times>(inv a) = e"
+  by (metis has_identity has_inverse identity_l inverse_l is_assoc)
 
-lemma (in group) inv_unique:
-  assumes eq: "mult G y x = unit G"  "mult G x y' = unit G"
-    and G: "x \<in> carrier G"  "y \<in> carrier G"  "y' \<in> carrier G"
-  shows "y = y'"
+lemma identity_r [simp]: "a \<in> carrier G \<Longrightarrow> a \<times> e = a"
 proof -
-  from G eq have "y = mult G y (mult G x y')" by simp
-  also from G have "... = mult G (mult G y x) y'" by (simp add: is_assoc)
-  also from G eq have "... = y'" by simp
-  finally show ?thesis .
+  fix a
+  assume 1: "a \<in> carrier G"
+  hence "a \<times> e = a \<times> (inv a) \<times> a"  
+    using has_inverse inverse_l is_assoc by presburger
+  also have "\<dots> = e \<times> a" using inverse_r is_assoc 1 by auto
+  also have "\<dots> = a" using identity_l 1 by auto
+  finally show "a \<times> e = a" .
 qed
 
-\<comment> \<open>steht nicht im Buch aber ist aus der ersten Implementierung kopiert\<close>
-
-
-
-lemma (in group) inv:
-  assumes eq: "mult G i a = e G"
-and G: "a \<in> carrier G"  "i \<in> carrier G"
-shows "i = inverse G a"
+text \<open>Postulat 5.\<close>
+lemma div_both_1 [simp]:
+  assumes "mult G a x = b" \<comment> \<open>Auch hier geht es nicht ohne `mult`\<close>
+    and "a \<in> carrier G" "x \<in> carrier G" "b \<in> carrier G"
+  shows "x = (inv a) \<times> b" using assms
 proof -
-  from G eq have "i \<in> carrier G \<and> mult G i a = unit G" by simp
-hence "i = (THE x. x \<in> carrier G \<and> mult G x a = e G)" by (simp add: inv_unique the_equality)
+  from assms have "a \<times> x = b" by auto
+  hence "(inv a) \<times> a \<times> x = (inv a) \<times> b"
+    by (meson assms has_inverse is_assoc)
+  hence "e \<times> x = (inv a) \<times> b" using inverse_l has_inverse assms by auto
+  thus "x = (inv a) \<times> b" using identity_l has_identity assms by auto
+qed
 
-  
+lemma div_both_2 [simp]:
+  assumes "mult G y a = b" \<comment> \<open>s.o.\<close>
+    and "a \<in> carrier G" "y \<in> carrier G" "b \<in> carrier G"
+  shows "y = b \<times> (inv a)" using assms
+proof -
+  from assms have "y \<times> a = b" by auto
+  hence "y \<times> a \<times> (inv a) = b \<times> (inv a)" by auto
+  hence "y \<times> e = b \<times> (inv a)" using inverse_r has_inverse assms is_assoc by auto
+  thus "y = b \<times> (inv a)" using identity_r assms by auto
+qed
 
+text \<open>Postulat 6.\<close>
+lemma div_unique [simp]:
+  assumes "mult G a x = mult G a x'" \<comment> \<open>s.o.\<close>
+    and "a \<in> carrier G"  "x \<in> carrier G"  "x' \<in> carrier G"
+  shows "x = x'" using assms
+proof -
+  from assms have "mult G a x = mult G a x'" by auto
+  hence "(inv a) \<times> a \<times> x = (inv a) \<times> a \<times> x'" 
+    using assms has_inverse is_assoc by metis
+  hence "e \<times> x = e \<times> x'" using assms by auto
+  then show "x = x'" using assms identity_l by auto
+qed
 
+end 
 (*
-lemma g_inv_e:
-  assumes eq: "mult G (inverse G a) a = e G"
-
-
-
-
-
- "mult G (mult G (inverse G a) a) (inverse G a) = inverse G a"
-
-
-
-lemma (in group) inv_r: 
-  assumes eq: "mult G i a = e G"
-and G: "a \<in> carrier G"  "i \<in> carrier G"
-shows "mult G a i = e G"
-proof -
-
-
-
-
-
 lemma groupI:
   fixes G (structure)
   assumes g_closed:
