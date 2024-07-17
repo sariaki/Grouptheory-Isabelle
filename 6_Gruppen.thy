@@ -87,7 +87,7 @@ record 'a group =
   unit :: "'a" ("e")
 
 definition inverse :: "('a, 'b) group_scheme \<Rightarrow> 'a \<Rightarrow> 'a"
-  where "inverse G a = (THE i. i \<in> carrier G \<and> mult G i a = unit G \<and> mult G a i = unit G)" \<comment> \<open>a\<inverse> als Variablenname ist nicht erlaubt in Isabelle\<close>
+  where "inverse G a = (THE i. i \<in> carrier G \<and> mult G i a = unit G)" \<comment> \<open>a\<inverse> als Variablenname ist nicht erlaubt in Isabelle\<close>
 \<comment> \<open>In \<section>9. wird eigentlich erstmal nur von einem linksseitigen inversen Element gesprochen\<close>
 
 definition group_inverse_elements :: "('a, 'b) group_scheme \<Rightarrow> 'a set" where
@@ -113,8 +113,54 @@ locale group =
 definition (in group) is_abelian :: "bool" where
   "is_abelian = (if (\<forall>a \<in> carrier G. \<forall>b \<in> carrier G. mult G a b = mult G b a) then True else False)"
 
+
+lemma (in group) inv_unique:
+  assumes eq: "mult G y x = unit G"  "mult G x y' = unit G"
+    and G: "x \<in> carrier G"  "y \<in> carrier G"  "y' \<in> carrier G"
+  shows "y = y'"
+proof -
+  from G eq have "y = mult G y (mult G x y')" by simp
+  also from G have "... = mult G (mult G y x) y'" by (simp add: is_assoc)
+  also from G eq have "... = y'" by simp
+  finally show ?thesis .
+qed
+
+\<comment> \<open>steht nicht im Buch aber ist aus der ersten Implementierung kopiert\<close>
+
+
+
+lemma (in group) inv:
+  assumes eq: "mult G i a = e G"
+and G: "a \<in> carrier G"  "i \<in> carrier G"
+shows "i = inverse G a"
+proof -
+  from G eq have "i \<in> carrier G \<and> mult G i a = unit G" by simp
+hence "i = (THE x. x \<in> carrier G \<and> mult G x a = e G)" by (simp add: inv_unique the_equality)
+
+  
+
+
 (*
-lemma g_inv_e: "(mult (mult (inverse G a) a) inverse G a) = (inverse G a)"
+lemma g_inv_e:
+  assumes eq: "mult G (inverse G a) a = e G"
+
+
+
+
+
+ "mult G (mult G (inverse G a) a) (inverse G a) = inverse G a"
+
+
+
+lemma (in group) inv_r: 
+  assumes eq: "mult G i a = e G"
+and G: "a \<in> carrier G"  "i \<in> carrier G"
+shows "mult G a i = e G"
+proof -
+
+
+
+
 
 lemma groupI:
   fixes G (structure)

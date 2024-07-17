@@ -86,33 +86,34 @@ record 'a group =
   mult :: "'a \<Rightarrow> 'a \<Rightarrow> 'a"
   unit :: "'a" ("e")
 
-definition
-  inverse :: "('a, 'b) group_scheme \<Rightarrow> 'a \<Rightarrow> 'a"
-  where "inverse G a = (THE i. i \<in> carrier G \<and> mult G i a = unit G)" \<comment> \<open>a\<inverse> als Variablenname ist nicht erlaubt in Isabelle\<close>
-\<comment> \<open>In \<section>9. wird erstmal nur von einem linksseitigen inversem Element gesprochen\<close>
+definition inverse :: "('a, 'b) group_scheme \<Rightarrow> 'a \<Rightarrow> 'a"
+  where "inverse G a = (THE i. i \<in> carrier G \<and> mult G i a = unit G \<and> mult G a i = unit G)" \<comment> \<open>a\<inverse> als Variablenname ist nicht erlaubt in Isabelle\<close>
+\<comment> \<open>In \<section>9. wird eigentlich erstmal nur von einem linksseitigen inversen Element gesprochen\<close>
 
 definition group_inverse_elements :: "('a, 'b) group_scheme \<Rightarrow> 'a set" where
-  "group_inverse_elements G = {a. a \<in> carrier G \<and> (\<exists>b. a = inverse G b)}" \<comment> \<open>nicht explizit in v.d.W. Text erwähnt\<close>
+  "group_inverse_elements G = {a. a \<in> carrier G \<and> (\<exists>b \<in> carrier G. a = inverse G b)}" \<comment> \<open>nicht explizit in v.d.W. Text erwähnt\<close>
 
 locale group =
   fixes G (structure)
   assumes not_empty: "carrier G \<noteq> {}"
 
-  and is_closed: "\<lbrakk>a \<in> carrier G; b \<in> carrier G\<rbrakk> \<comment> \<open>Zusammensetzungsvorschrift\<close>
+  and is_closed [intro, simp]: "\<lbrakk>a \<in> carrier G; b \<in> carrier G\<rbrakk> \<comment> \<open>Zusammensetzungsvorschrift\<close>
     \<Longrightarrow> mult G a b \<in> carrier G" 
 
   and is_assoc: "\<lbrakk>a \<in> carrier G; b \<in> carrier G; c \<in> carrier G\<rbrakk> \<comment> \<open>Assoziativgesetz\<close>
     \<Longrightarrow> mult G (mult G a b) c = mult G a (mult G b c)"
 
-  and has_identity: "unit G \<in> carrier G" \<comment> \<open>Einselement\<close>
+  and has_identity [intro, simp]: "unit G \<in> carrier G" \<comment> \<open>Einselement\<close>
   and identity_l [simp]: "a \<in> carrier G \<Longrightarrow> mult G (unit G) a = a"
+  and identity_r [simp]: "a \<in> carrier G \<Longrightarrow> mult G a (unit G) = a" \<comment> \<open>In \<section>9. wird eigentlich erstmal nur von einem linksseitigen Einselement gesprochen\<close>
 
   and group_inverse_all: "carrier G = group_inverse_elements G" \<comment> \<open>Inverses Element\<close>
   and has_inverse: "a \<in> carrier G \<Longrightarrow> inverse G a \<in> carrier G"
 
 definition (in group) is_abelian :: "bool" where
-  "is_abelian = (if (\<forall>a \<in> carrier G. \<forall>b \<in> carrier G. mult G a b = mult G a b) then True else False)"
+  "is_abelian = (if (\<forall>a \<in> carrier G. \<forall>b \<in> carrier G. mult G a b = mult G b a) then True else False)"
 
+(*
 lemma g_inv_e: "(mult (mult (inverse G a) a) inverse G a) = (inverse G a)"
 
 lemma groupI:
@@ -126,7 +127,7 @@ lemma groupI:
     and not_empty: "carrier G \<noteq> {}"
     and has_inverse: "x \<in> carrier G \<Longrightarrow> inverse G x \<in> carrier G"
   shows "group G"
-
+*)
 
 
 
