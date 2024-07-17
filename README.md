@@ -2,7 +2,7 @@
 - [x] abelsche Gruppen entweder als neues locale oder als definition
 - [x] Beweisen Rechtsseitigkeit Inverses und Einselelement S.22
 
-- [ ] Postulat 5
+- [x] Postulat 5
 - [x] Post 6. Eindeutigkeit der Division 
 - [ ] (Eindeutigkeit des Einselelements und des Inversen)
 
