@@ -185,6 +185,27 @@ proof -
   thus "x = inv a" using assms inverse_r identity_l by simp
 qed
 
+(*
+lemma one_two_five_implies_three:
+  fixes c
+  fixes d
+  assumes one: "\<lbrakk>a \<in> carrier G; b \<in> carrier G\<rbrakk> \<Longrightarrow> (a \<times> b) \<in> carrier G"
+    and two: "\<lbrakk>a \<in> carrier G; b \<in> carrier G; c \<in> carrier G\<rbrakk> \<Longrightarrow> mult G (mult G a b) c = mult G a (mult G b c)"
+    and five_r: "\<lbrakk>a \<in> carrier G; b \<in> carrier G; mult G a x = b\<rbrakk> \<Longrightarrow> x = (inv a) \<times> b"
+    and five_l: "\<lbrakk>a \<in> carrier G; b \<in> carrier G; mult G y a = b\<rbrakk> \<Longrightarrow> y = b \<times> (inv a)"
+    and eq_1: "c \<in> carrier G" "x \<in> carrier G"
+    and eq: "mult G d c = c"
+  shows "mult G e a = a"
+proof -
+  have "d \<times> c = c" using eq by simp
+  from this have "d = c \<times> (inv c)" using five_l eq_1 eq by simp
+
+qed
+*)
+
+
+
+
 
 end 
 (*
