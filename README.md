@@ -4,7 +4,7 @@
 
 - [x] Postulat 5
 - [x] Post 6. Eindeutigkeit der Division 
-- [ ] (Eindeutigkeit des Einselelements und des Inversen)
+- [x] (Eindeutigkeit des Einselelements und des Inversen)
 
 - [ ] Beweis Post. 1, 2, 5 -> 3
 - [ ] 6 / 5 für endliche Mengen Beweis
