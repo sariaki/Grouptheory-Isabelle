@@ -160,6 +160,23 @@ proof -
   then show "x = x'" using assms identity_l by auto
 qed
 
+
+lemma unit_unique:
+  assumes "mult G x a = a"
+and "a \<in> carrier G"  "x \<in> carrier G"
+shows "x = unit G" using assms
+proof -
+  have "mult G e a = a" using has_identity assms by auto
+  then have "mult G e a = mult G x a" using assms by auto
+  hence "e \<times> a \<times> (inv a) = x \<times> a \<times> (inv a)" using assms has_inverse is_assoc by metis
+  hence "e \<times> (a \<times>(inv a)) = x \<times> (a \<times> (inv a))" using assms(2) assms(3) is_assoc by simp
+  hence "e \<times> e = x \<times> e" using assms inverse_r by simp
+  hence "e = x" using assms identity_r by simp
+  thus "x = unit G" using assms by simp
+qed
+
+
+
 end 
 (*
 lemma groupI:
