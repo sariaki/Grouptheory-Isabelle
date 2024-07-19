@@ -54,7 +54,7 @@ text\<open>Die Beispiele sollen nur bei der Formalisierung übersprungen werden.
   Insgesamt sieht der Aufbau folgendermaßen: Zunächst wird ein record monoid definiert, der folgendes 
   umfasst:
   \<^enum> einen "carrier", d.h. eine Menge von Elementen von Typ 'a
-  \<^enum> eine Verknüpfung "mult", d.h. eine Operation vom Typ carrier \<times> carrier \<rightarrow> carrier
+  \<^enum> eine Verknüpfung "mult", d.h. eine Operation vom Typ carrier \<otimes> carrier \<rightarrow> carrier
   \<^enum> ein "unit"-Element e.
   Dann wird eine Menge (zweiseitiger) Einheitselemente definiert (d.h. eine Element x zu dem es ein
   Inverses x\<inverse> mit x x\<inverse> = x\<inverse> x = e gibt) is defined.
@@ -83,7 +83,7 @@ text \<open>Mengenlehre kann vorausgesetzt werden.
 section \<open>Versuch der Formalisierung von van der Waerden\<close>
 record 'a group =
   carrier :: "'a set"
-  mult :: "'a \<Rightarrow> 'a \<Rightarrow> 'a" (infixl "\<times>\<index>" 70)
+  mult :: "'a \<Rightarrow> 'a \<Rightarrow> 'a" (infixl "\<otimes>\<index>" 70)
   unit :: "'a" ("e\<index>")
 
 locale group =
@@ -93,58 +93,58 @@ locale group =
   assumes not_empty: "carrier G \<noteq> {}"
 
   and is_closed [intro, simp]: "\<lbrakk>a \<in> carrier G; b \<in> carrier G\<rbrakk> \<comment> \<open>Zusammensetzungsvorschrift\<close>
-    \<Longrightarrow> (a \<times> b) \<in> carrier G" 
+    \<Longrightarrow> (a \<otimes> b) \<in> carrier G" 
 
   and is_assoc: "\<lbrakk>a \<in> carrier G; b \<in> carrier G; c \<in> carrier G\<rbrakk> \<comment> \<open>Assoziativgesetz\<close>
     \<Longrightarrow> mult G (mult G a b) c = mult G a (mult G b c)" \<comment> \<open>Ohne `mult` kriegen wir einen komischen Error\<close>
 
   and has_identity [intro, simp]: "unit G \<in> carrier G" \<comment> \<open>Einselement\<close>
-  and identity_l [simp]: "a \<in> carrier G \<Longrightarrow> e \<times> a = a" 
+  and identity_l [simp]: "a \<in> carrier G \<Longrightarrow> e \<otimes> a = a" 
 
   (*and group_inverse_all: "carrier G = group_inverse_elements G" \<comment> \<open>Inverses Element\<close>*)
   and has_inverse [intro, simp]: "a \<in> carrier G \<Longrightarrow> inv a \<in> carrier G"
-  and inverse_l [simp]: "a \<in> carrier G  \<Longrightarrow> (inv a) \<times> a = e"
+  and inverse_l [simp]: "a \<in> carrier G  \<Longrightarrow> (inv a) \<otimes> a = e"
 
 begin 
 definition is_abelian :: "bool" where
-  "is_abelian = (if (\<forall>a \<in> carrier G. \<forall>b \<in> carrier G. a \<times> b = b \<times> a) then True else False)"
+  "is_abelian = (if (\<forall>a \<in> carrier G. \<forall>b \<in> carrier G. a \<otimes> b = b \<otimes> a) then True else False)"
 
-lemma inverse_r [simp]: "a \<in> carrier G \<Longrightarrow> a \<times>(inv a) = e"
+lemma inverse_r [simp]: "a \<in> carrier G \<Longrightarrow> a \<otimes>(inv a) = e"
   by (metis has_identity has_inverse identity_l inverse_l is_assoc)
 
-lemma identity_r [simp]: "a \<in> carrier G \<Longrightarrow> a \<times> e = a"
+lemma identity_r [simp]: "a \<in> carrier G \<Longrightarrow> a \<otimes> e = a"
 proof -
   fix a
   assume 1: "a \<in> carrier G"
-  hence "a \<times> e = a \<times> (inv a) \<times> a"  
+  hence "a \<otimes> e = (a \<otimes> (inv a)) \<otimes> a"  
     using has_inverse inverse_l is_assoc by presburger
-  also have "\<dots> = e \<times> a" using inverse_r is_assoc 1 by auto
+  also have "\<dots> = e \<otimes> a" using inverse_r is_assoc 1 by auto
   also have "\<dots> = a" using identity_l 1 by auto
-  finally show "a \<times> e = a" .
+  finally show "a \<otimes> e = a" .
 qed
 
 text \<open>Postulat 5.\<close>
 lemma div_both_1 [simp]:
   assumes "mult G a x = b" \<comment> \<open>Auch hier geht es nicht ohne `mult`\<close>
     and "a \<in> carrier G" "x \<in> carrier G" "b \<in> carrier G"
-  shows "x = (inv a) \<times> b" using assms
+  shows "x = (inv a) \<otimes> b" using assms
 proof -
-  from assms have "a \<times> x = b" by auto
-  hence "(inv a) \<times> a \<times> x = (inv a) \<times> b"
+  from assms have "a \<otimes> x = b" by auto
+  hence "(inv a) \<otimes> a \<otimes> x = (inv a) \<otimes> b"
     by (meson assms has_inverse is_assoc)
-  hence "e \<times> x = (inv a) \<times> b" using inverse_l has_inverse assms by auto
-  thus "x = (inv a) \<times> b" using identity_l has_identity assms by auto
+  hence "e \<otimes> x = (inv a) \<otimes> b" using inverse_l has_inverse assms by auto
+  thus "x = (inv a) \<otimes> b" using identity_l has_identity assms by auto
 qed
 
 lemma div_both_2 [simp]:
   assumes "mult G y a = b" \<comment> \<open>s.o.\<close>
     and "a \<in> carrier G" "y \<in> carrier G" "b \<in> carrier G"
-  shows "y = b \<times> (inv a)" using assms
+  shows "y = b \<otimes> (inv a)" using assms
 proof -
-  from assms have "y \<times> a = b" by auto
-  hence "y \<times> a \<times> (inv a) = b \<times> (inv a)" by auto
-  hence "y \<times> e = b \<times> (inv a)" using inverse_r has_inverse assms is_assoc by auto
-  thus "y = b \<times> (inv a)" using identity_r assms by auto
+  from assms have "y \<otimes> a = b" by auto
+  hence "y \<otimes> a \<otimes> (inv a) = b \<otimes> (inv a)" by auto
+  hence "y \<otimes> e = b \<otimes> (inv a)" using inverse_r has_inverse assms is_assoc by auto
+  thus "y = b \<otimes> (inv a)" using identity_r assms by auto
 qed
 
 text \<open>Postulat 6.\<close>
@@ -154,9 +154,9 @@ lemma div_unique [simp]:
   shows "x = x'" using assms
 proof -
   from assms have "mult G a x = mult G a x'" by auto
-  hence "(inv a) \<times> a \<times> x = (inv a) \<times> a \<times> x'" 
+  hence "(inv a) \<otimes> a \<otimes> x = (inv a) \<otimes> a \<otimes> x'" 
     using assms has_inverse is_assoc by metis
-  hence "e \<times> x = e \<times> x'" using assms by auto
+  hence "e \<otimes> x = e \<otimes> x'" using assms by auto
   then show "x = x'" using assms identity_l by auto
 qed
 
@@ -167,9 +167,9 @@ shows "x = unit G" using assms
 proof -
   have "mult G e a = a" using has_identity assms by auto
   then have "mult G e a = mult G x a" using assms by auto
-  hence "e \<times> a \<times> (inv a) = x \<times> a \<times> (inv a)" using assms has_inverse is_assoc by metis
-  hence "e \<times> (a \<times>(inv a)) = x \<times> (a \<times> (inv a))" using assms(2) assms(3) is_assoc by simp
-  hence "e \<times> e = x \<times> e" using assms inverse_r by simp
+  hence "e \<otimes> a \<otimes> (inv a) = x \<otimes> a \<otimes> (inv a)" using assms has_inverse is_assoc by metis
+  hence "e \<otimes> (a \<otimes>(inv a)) = x \<otimes> (a \<otimes> (inv a))" using assms(2) assms(3) is_assoc by simp
+  hence "e \<otimes> e = x \<otimes> e" using assms inverse_r by simp
   hence "e = x" using assms identity_r by simp
   thus "x = unit G" using assms by simp
 qed
@@ -179,9 +179,9 @@ lemma inv_unique:
 and "a \<in> carrier G"  "x \<in> carrier G"
 shows " x = inv a" using assms
 proof -
-  have "x \<times> a = e" using assms has_inverse by auto
-  hence "x \<times> a \<times> (inv a) = e \<times> (inv a)" using assms has_inverse by simp
-  hence "x \<times> (a \<times>(inv a)) = (inv a)" using assms(2) assms(3) is_assoc by simp
+  have "x \<otimes> a = e" using assms has_inverse by auto
+  hence "x \<otimes> a \<otimes> (inv a) = e \<otimes> (inv a)" using assms has_inverse by simp
+  hence "x \<otimes> (a \<otimes>(inv a)) = (inv a)" using assms(2) assms(3) is_assoc by simp
   thus "x = inv a" using assms inverse_r identity_l by simp
 qed
 
@@ -189,16 +189,16 @@ qed
 lemma one_two_five_implies_three:
   fixes c
   fixes d
-  assumes one: "\<lbrakk>a \<in> carrier G; b \<in> carrier G\<rbrakk> \<Longrightarrow> (a \<times> b) \<in> carrier G"
+  assumes one: "\<lbrakk>a \<in> carrier G; b \<in> carrier G\<rbrakk> \<Longrightarrow> (a \<otimes> b) \<in> carrier G"
     and two: "\<lbrakk>a \<in> carrier G; b \<in> carrier G; c \<in> carrier G\<rbrakk> \<Longrightarrow> mult G (mult G a b) c = mult G a (mult G b c)"
-    and five_r: "\<lbrakk>a \<in> carrier G; b \<in> carrier G; mult G a x = b\<rbrakk> \<Longrightarrow> x = (inv a) \<times> b"
-    and five_l: "\<lbrakk>a \<in> carrier G; b \<in> carrier G; mult G y a = b\<rbrakk> \<Longrightarrow> y = b \<times> (inv a)"
+    and five_r: "\<lbrakk>a \<in> carrier G; b \<in> carrier G; mult G a x = b\<rbrakk> \<Longrightarrow> x = (inv a) \<otimes> b"
+    and five_l: "\<lbrakk>a \<in> carrier G; b \<in> carrier G; mult G y a = b\<rbrakk> \<Longrightarrow> y = b \<otimes> (inv a)"
     and eq_1: "c \<in> carrier G" "x \<in> carrier G"
     and eq: "mult G d c = c"
   shows "mult G e a = a"
 proof -
-  have "d \<times> c = c" using eq by simp
-  from this have "d = c \<times> (inv c)" using five_l eq_1 eq by simp
+  have "d \<otimes> c = c" using eq by simp
+  from this have "d = c \<otimes> (inv c)" using five_l eq_1 eq by simp
 
 qed
 *)

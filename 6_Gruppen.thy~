@@ -160,6 +160,53 @@ proof -
   then show "x = x'" using assms identity_l by auto
 qed
 
+lemma unit_unique:
+  assumes "mult G x a = a"
+and "a \<in> carrier G"  "x \<in> carrier G"
+shows "x = unit G" using assms
+proof -
+  have "mult G e a = a" using has_identity assms by auto
+  then have "mult G e a = mult G x a" using assms by auto
+  hence "e \<times> a \<times> (inv a) = x \<times> a \<times> (inv a)" using assms has_inverse is_assoc by metis
+  hence "e \<times> (a \<times>(inv a)) = x \<times> (a \<times> (inv a))" using assms(2) assms(3) is_assoc by simp
+  hence "e \<times> e = x \<times> e" using assms inverse_r by simp
+  hence "e = x" using assms identity_r by simp
+  thus "x = unit G" using assms by simp
+qed
+
+lemma inv_unique:
+  assumes "mult G x a = e"
+and "a \<in> carrier G"  "x \<in> carrier G"
+shows " x = inv a" using assms
+proof -
+  have "x \<times> a = e" using assms has_inverse by auto
+  hence "x \<times> a \<times> (inv a) = e \<times> (inv a)" using assms has_inverse by simp
+  hence "x \<times> (a \<times>(inv a)) = (inv a)" using assms(2) assms(3) is_assoc by simp
+  thus "x = inv a" using assms inverse_r identity_l by simp
+qed
+
+(*
+lemma one_two_five_implies_three:
+  fixes c
+  fixes d
+  assumes one: "\<lbrakk>a \<in> carrier G; b \<in> carrier G\<rbrakk> \<Longrightarrow> (a \<times> b) \<in> carrier G"
+    and two: "\<lbrakk>a \<in> carrier G; b \<in> carrier G; c \<in> carrier G\<rbrakk> \<Longrightarrow> mult G (mult G a b) c = mult G a (mult G b c)"
+    and five_r: "\<lbrakk>a \<in> carrier G; b \<in> carrier G; mult G a x = b\<rbrakk> \<Longrightarrow> x = (inv a) \<times> b"
+    and five_l: "\<lbrakk>a \<in> carrier G; b \<in> carrier G; mult G y a = b\<rbrakk> \<Longrightarrow> y = b \<times> (inv a)"
+    and eq_1: "c \<in> carrier G" "x \<in> carrier G"
+    and eq: "mult G d c = c"
+  shows "mult G e a = a"
+proof -
+  have "d \<times> c = c" using eq by simp
+  from this have "d = c \<times> (inv c)" using five_l eq_1 eq by simp
+
+qed
+*)
+
+
+
+
+
 end 
 (*
 lemma groupI:

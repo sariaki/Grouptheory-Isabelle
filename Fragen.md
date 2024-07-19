@@ -1,4 +1,2 @@
-- warum sorgt "ı" bei infixl für Probleme
-- warum funktioniert "×" bei manchen Definitionen nicht
 - `inverse_r` Beweis
 - sollten die in der Aufgabenstellung erwähnten Einheitselemente nicht inverse Elemente sein?
