@@ -136,6 +136,20 @@ proof -
   thus "x = (inv a) \<otimes> b" using identity_l has_identity assms by auto
 qed
 
+lemma div_same_r:
+  assumes "mult G a x = a"
+and "a \<in> carrier G" "x \<in> carrier G" 
+shows "x = e" using assms
+proof -
+  have "mult G a e = a" using has_identity assms by auto
+  then have "a \<otimes> e = a \<otimes> x" using assms by auto
+  hence "(inv a) \<otimes> a \<otimes> e = (inv a) \<otimes> a \<otimes> x" using assms has_inverse is_assoc by fastforce
+  hence "((inv a) \<otimes> a) \<otimes> e = ((inv a) \<otimes> a) \<otimes> x" using assms(2) assms(3) is_assoc by simp
+  hence "e \<otimes> e = e \<otimes> x" using assms inverse_l by simp
+  thus "x = e" using identity_l has_identity assms by auto
+qed
+
+
 lemma div_both_2 [simp]:
   assumes "mult G y a = b" \<comment> \<open>s.o.\<close>
     and "a \<in> carrier G" "y \<in> carrier G" "b \<in> carrier G"
@@ -185,7 +199,7 @@ proof -
   thus "x = inv a" using assms inverse_r identity_l by simp
 qed
 
-(*
+
 lemma one_two_five_implies_three:
   fixes c
   fixes d
@@ -194,15 +208,13 @@ lemma one_two_five_implies_three:
     and five_r: "\<lbrakk>a \<in> carrier G; b \<in> carrier G; mult G a x = b\<rbrakk> \<Longrightarrow> x = (inv a) \<otimes> b"
     and five_l: "\<lbrakk>a \<in> carrier G; b \<in> carrier G; mult G y a = b\<rbrakk> \<Longrightarrow> y = b \<otimes> (inv a)"
     and eq_1: "c \<in> carrier G" "x \<in> carrier G"
-    and eq: "mult G d c = c"
-  shows "mult G e a = a"
+    and eq: "d \<otimes> c = c"
+  shows "e \<otimes> a = a"
 proof -
   have "d \<otimes> c = c" using eq by simp
-  from this have "d = c \<otimes> (inv c)" using five_l eq_1 eq by simp
-
+  from this have "d = c \<otimes> (inv c)" 
+    sorry
 qed
-*)
-
 
 
 
