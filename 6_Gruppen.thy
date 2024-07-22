@@ -201,6 +201,7 @@ qed
 
 
 lemma inv_mult:
+  fixes a b c
   assumes "a \<in> carrier G"  "b \<in> carrier G" "c \<in> carrier G" "inv(a \<otimes> b) = c"
   shows "inv(a \<otimes> b) = (inv a) \<otimes> (inv b)"
 proof -
@@ -209,7 +210,8 @@ proof -
   hence "(inv a) \<otimes> a = (a \<otimes> b) \<otimes> c" using assms has_inverse inverse_l is_assoc is_closed by auto
   hence "(inv a) \<otimes> a \<otimes> e = (a \<otimes> b) \<otimes> c" using assms identity_r by auto
   hence "(inv a) \<otimes> a \<otimes> b \<otimes> (inv b) = (a \<otimes> b) \<otimes> c" using assms has_inverse inverse_r is_assoc is_closed by metis
-  hence "(inv a) \<otimes> (inv b) = c" using assms is_assoc by
+  hence "(inv a) \<otimes> (a \<otimes> b) \<otimes> (inv b) = (a \<otimes> b) \<otimes> c" using assms is_assoc has_inverse by metis
+  hence "(inv a) \<otimes> (inv b) = c" using assms is_assoc has_inverse is_closed inverse_r inverse_l by try
 
 
 lemma one_two_five_implies_three:
