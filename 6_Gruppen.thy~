@@ -201,6 +201,7 @@ qed
 
 
 lemma inv_mult:
+  fixes a b c
   assumes "a \<in> carrier G"  "b \<in> carrier G" "c \<in> carrier G" "inv(a \<otimes> b) = c"
   shows "inv(a \<otimes> b) = (inv a) \<otimes> (inv b)"
 proof -

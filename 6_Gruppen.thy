@@ -203,15 +203,22 @@ qed
 lemma inv_mult:
   fixes a b c
   assumes "a \<in> carrier G"  "b \<in> carrier G" "c \<in> carrier G" "inv(a \<otimes> b) = c"
-  shows "inv(a \<otimes> b) = (inv a) \<otimes> (inv b)"
+  shows "inv(a \<otimes> b) = (inv b) \<otimes> (inv a)"
 proof -
+  from assms has_inverse inverse_l have 1: "c \<otimes> (a \<otimes> b) = e" by auto
+  from assms has_inverse inverse_l have "(inv a) \<otimes> a = e" by auto
+  from assms this identity_l has_identity have "e \<otimes>(inv a) \<otimes> a = e" by auto
+
+
+(*
   from assms has_inverse have "(a \<otimes> b) \<otimes> (inv (a \<otimes> b)) = (a \<otimes> b) \<otimes> c" by auto
   hence 1: "e = (a \<otimes> b) \<otimes> c" using has_inverse inverse_r is_assoc assms is_closed by metis
   hence "(inv a) \<otimes> a = (a \<otimes> b) \<otimes> c" using assms has_inverse inverse_l is_assoc is_closed by auto
   hence "(inv a) \<otimes> a \<otimes> e = (a \<otimes> b) \<otimes> c" using assms identity_r by auto
   hence "(inv a) \<otimes> a \<otimes> b \<otimes> (inv b) = (a \<otimes> b) \<otimes> c" using assms has_inverse inverse_r is_assoc is_closed by metis
   hence "(inv a) \<otimes> (a \<otimes> b) \<otimes> (inv b) = (a \<otimes> b) \<otimes> c" using assms is_assoc has_inverse by metis
-  hence "(inv a) \<otimes> (inv b) = c" using assms is_assoc has_inverse is_closed inverse_r inverse_l by try
+  hence "(inv a) \<otimes> (inv b) = c" using assms is_assoc has_inverse is_closed inverse_r inverse_l try
+*)
 
 
 lemma one_two_five_implies_three:
