@@ -199,6 +199,16 @@ proof -
   thus "x = inv a" using assms inverse_r identity_l by simp
 qed
 
+lemma help_me:
+  assumes "a \<in> carrier G"  "b \<in> carrier G"
+  shows "((inv b) \<otimes> (inv a)) \<otimes> (a \<otimes> b) = e"
+proof -
+  have "((inv b) \<otimes> (inv a)) \<otimes> (a \<otimes> b) = (inv b) \<otimes> ((inv a) \<otimes> a) \<otimes> b" using assms is_assoc has_inverse is_closed by metis
+  moreover have "... = (inv b) \<otimes> e \<otimes> b" using assms has_inverse inverse_l by auto
+  moreover have "... = (inv b) \<otimes> b" using has_identity identity_r assms by auto
+  moreover have "... = e" using assms has_inverse inverse_l by auto
+  ultimately show ?thesis by auto
+qed
 
 lemma inv_mult:
   fixes a b c
@@ -206,19 +216,13 @@ lemma inv_mult:
   shows "inv(a \<otimes> b) = (inv b) \<otimes> (inv a)"
 proof -
   from assms has_inverse inverse_l have 1: "c \<otimes> (a \<otimes> b) = e" by auto
-  from assms has_inverse inverse_l have "(inv a) \<otimes> a = e" by auto
-  from assms this identity_l has_identity have "e \<otimes>(inv a) \<otimes> a = e" by auto
+  from assms identity_r have "(inv b) \<otimes> (inv a) = ((inv b) \<otimes> (inv a)) \<otimes> e" by auto
+  moreover have "... = ((inv b) \<otimes> (inv a)) \<otimes> (a \<otimes> b) \<otimes> (inv (a \<otimes> b))" using has_identity identity_r assms by auto
+  moreover have "... = (((inv b) \<otimes> (inv a)) \<otimes> (a \<otimes> b)) \<otimes> (inv (a \<otimes> b))" using has_identity identity_r assms by auto
+  moreover have "... = e \<otimes> (inv (a \<otimes> b))" using has_inverse inverse_l assms is_assoc help_me by auto
+  moreover have "... = (inv (a \<otimes> b))" using has_identity identity_l assms by auto
+  ultimately show ?thesis by auto
 
-
-(*
-  from assms has_inverse have "(a \<otimes> b) \<otimes> (inv (a \<otimes> b)) = (a \<otimes> b) \<otimes> c" by auto
-  hence 1: "e = (a \<otimes> b) \<otimes> c" using has_inverse inverse_r is_assoc assms is_closed by metis
-  hence "(inv a) \<otimes> a = (a \<otimes> b) \<otimes> c" using assms has_inverse inverse_l is_assoc is_closed by auto
-  hence "(inv a) \<otimes> a \<otimes> e = (a \<otimes> b) \<otimes> c" using assms identity_r by auto
-  hence "(inv a) \<otimes> a \<otimes> b \<otimes> (inv b) = (a \<otimes> b) \<otimes> c" using assms has_inverse inverse_r is_assoc is_closed by metis
-  hence "(inv a) \<otimes> (a \<otimes> b) \<otimes> (inv b) = (a \<otimes> b) \<otimes> c" using assms is_assoc has_inverse by metis
-  hence "(inv a) \<otimes> (inv b) = c" using assms is_assoc has_inverse is_closed inverse_r inverse_l try
-*)
 
 
 lemma one_two_five_implies_three:
