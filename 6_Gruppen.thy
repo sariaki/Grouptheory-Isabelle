@@ -101,8 +101,7 @@ locale group =
   and has_identity [intro, simp]: "unit G \<in> carrier G" \<comment> \<open>Einselement\<close>
   and identity_l [simp]: "a \<in> carrier G \<Longrightarrow> e \<otimes> a = a" 
 
-  (*and group_inverse_all: "carrier G = group_inverse_elements G" \<comment> \<open>Inverses Element\<close>*)
-  and has_inverse [intro, simp]: "a \<in> carrier G \<Longrightarrow> inv a \<in> carrier G"
+  and has_inverse [intro, simp]: "a \<in> carrier G \<Longrightarrow> inv a \<in> carrier G" \<comment> \<open>Inverses Element\<close>
   and inverse_l [simp]: "a \<in> carrier G  \<Longrightarrow> (inv a) \<otimes> a = e"
 
 begin 
@@ -125,7 +124,7 @@ qed
 
 text \<open>Postulat 5.\<close>
 lemma div_both_1 [simp]:
-  assumes "mult G a x = b" \<comment> \<open>Auch hier geht es nicht ohne `mult`\<close>
+  assumes "a \<otimes> x = b" 
     and "a \<in> carrier G" "x \<in> carrier G" "b \<in> carrier G"
   shows "x = (inv a) \<otimes> b" using assms
 proof -
@@ -136,22 +135,8 @@ proof -
   thus "x = (inv a) \<otimes> b" using identity_l has_identity assms by auto
 qed
 
-lemma div_same_r:
-  assumes "mult G a x = a"
-and "a \<in> carrier G" "x \<in> carrier G" 
-shows "x = e" using assms
-proof -
-  have "mult G a e = a" using has_identity assms by auto
-  then have "a \<otimes> e = a \<otimes> x" using assms by auto
-  hence "(inv a) \<otimes> a \<otimes> e = (inv a) \<otimes> a \<otimes> x" using assms has_inverse is_assoc by fastforce
-  hence "((inv a) \<otimes> a) \<otimes> e = ((inv a) \<otimes> a) \<otimes> x" using assms(2) assms(3) is_assoc by simp
-  hence "e \<otimes> e = e \<otimes> x" using assms inverse_l by simp
-  thus "x = e" using identity_l has_identity assms by auto
-qed
-
-
 lemma div_both_2 [simp]:
-  assumes "mult G y a = b" \<comment> \<open>s.o.\<close>
+  assumes "y \<otimes> a = b" 
     and "a \<in> carrier G" "y \<in> carrier G" "b \<in> carrier G"
   shows "y = b \<otimes> (inv a)" using assms
 proof -
@@ -163,7 +148,7 @@ qed
 
 text \<open>Postulat 6.\<close>
 lemma div_unique [simp]:
-  assumes "mult G a x = mult G a x'" \<comment> \<open>s.o.\<close>
+  assumes "a \<otimes> x = a \<otimes> x'" 
     and "a \<in> carrier G"  "x \<in> carrier G"  "x' \<in> carrier G"
   shows "x = x'" using assms
 proof -
@@ -175,21 +160,20 @@ proof -
 qed
 
 lemma unit_unique:
-  assumes "mult G x a = a"
-    and "a \<in> carrier G"  "x \<in> carrier G"
+  assumes "a \<otimes> x = a"
+and "a \<in> carrier G" "x \<in> carrier G" 
 shows "x = e" using assms
 proof -
-  have "mult G e a = a" using has_identity assms by auto
-  then have "mult G e a = mult G x a" using assms by auto
-  hence "e \<otimes> a \<otimes> (inv a) = x \<otimes> a \<otimes> (inv a)" using assms has_inverse is_assoc by metis
-  hence "e \<otimes> (a \<otimes>(inv a)) = x \<otimes> (a \<otimes> (inv a))" using assms(2) assms(3) is_assoc by simp
-  hence "e \<otimes> e = x \<otimes> e" using assms inverse_r by simp
-  hence "e = x" using assms identity_r by simp
-  thus "x = unit G" using assms by simp
+  have "a \<otimes> e = a" using has_identity assms by auto
+  then have "a \<otimes> e = a \<otimes> x" using assms by auto
+  hence "(inv a) \<otimes> a \<otimes> e = (inv a) \<otimes> a \<otimes> x" using assms has_inverse is_assoc by fastforce
+  hence "((inv a) \<otimes> a) \<otimes> e = ((inv a) \<otimes> a) \<otimes> x" using assms(2) assms(3) is_assoc by simp
+  hence "e \<otimes> e = e \<otimes> x" using assms inverse_l by simp
+  thus "x = e" using identity_l has_identity assms by auto
 qed
 
 lemma inv_unique:
-  assumes "mult G x a = e"
+  assumes "x \<otimes> a = e"
 and "a \<in> carrier G"  "x \<in> carrier G"
 shows " x = inv a" using assms
 proof -
@@ -197,6 +181,25 @@ proof -
   hence "x \<otimes> a \<otimes> (inv a) = e \<otimes> (inv a)" using assms has_inverse by simp
   hence "x \<otimes> (a \<otimes>(inv a)) = (inv a)" using assms(2) assms(3) is_assoc by simp
   thus "x = inv a" using assms inverse_r identity_l by simp
+qed
+
+lemma one_two_five_implies_three:
+  fixes c
+  assumes one: "\<lbrakk>a \<in> carrier G; b \<in> carrier G\<rbrakk> \<Longrightarrow> (a \<otimes> b) \<in> carrier G"
+    and two: "\<lbrakk>a \<in> carrier G; b \<in> carrier G; c \<in> carrier G\<rbrakk> \<Longrightarrow> mult G (mult G a b) c = mult G a (mult G b c)"
+    and five_r: "\<lbrakk>a \<in> carrier G; b \<in> carrier G; mult G a x = b\<rbrakk> \<Longrightarrow> x = (inv a) \<otimes> b"
+    and five_l: "\<lbrakk>a \<in> carrier G; b \<in> carrier G; mult G y a = b\<rbrakk> \<Longrightarrow> y = b \<otimes> (inv a)"
+
+    and eq_1: "c \<in> carrier G" "x \<in> carrier G" "e' \<in> carrier G" "a \<in> carrier G"
+    and eq: "e' \<otimes> c = c"
+    and cx: "c \<otimes> x = a"
+  shows "e'\<otimes> a = a"
+proof -
+  have "c \<otimes> x = a" using cx by simp
+  hence "e' \<otimes> a = e' \<otimes> (c \<otimes> x)" by auto
+  hence "e' \<otimes> a = (e' \<otimes> c) \<otimes> x"  using cx eq_1 is_assoc by simp
+  hence "e' \<otimes> a = c \<otimes> x" using eq by simp
+  thus "e' \<otimes> a = a" using cx by simp
 qed
 
 lemma help_me:
@@ -223,27 +226,6 @@ proof -
   moreover have "... = (inv (a \<otimes> b))" using has_identity identity_l assms by auto
   ultimately show ?thesis by auto
 qed
-
-lemma one_two_five_implies_three:
-  fixes c
-  assumes one: "\<lbrakk>a \<in> carrier G; b \<in> carrier G\<rbrakk> \<Longrightarrow> (a \<otimes> b) \<in> carrier G"
-    and two: "\<lbrakk>a \<in> carrier G; b \<in> carrier G; c \<in> carrier G\<rbrakk> \<Longrightarrow> mult G (mult G a b) c = mult G a (mult G b c)"
-    and five_r: "\<lbrakk>a \<in> carrier G; b \<in> carrier G; mult G a x = b\<rbrakk> \<Longrightarrow> x = (inv a) \<otimes> b"
-    and five_l: "\<lbrakk>a \<in> carrier G; b \<in> carrier G; mult G y a = b\<rbrakk> \<Longrightarrow> y = b \<otimes> (inv a)"
-
-    and eq_1: "c \<in> carrier G" "x \<in> carrier G" "e' \<in> carrier G" "a \<in> carrier G"
-    and eq: "e' \<otimes> c = c"
-    and cx: "c \<otimes> x = a"
-  shows "e'\<otimes> a = a"
-proof -
-  have "c \<otimes> x = a" using cx by simp
-  hence "e' \<otimes> a = e' \<otimes> (c \<otimes> x)" by auto
-  hence "e' \<otimes> a = (e' \<otimes> c) \<otimes> x"  using cx eq_1 is_assoc by simp
-  hence "e' \<otimes> a = c \<otimes> x" using eq by simp
-  thus "e' \<otimes> a = a" using cx by simp
-qed
-
-
 
 
 end 

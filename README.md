@@ -6,11 +6,11 @@
 - [x] Post 6. Eindeutigkeit der Division 
 - [x] (Eindeutigkeit des Einselelements und des Inversen)
 
-- [ ] Beweis Post. 1, 2, 5 -> 3
+- [x] Beweis Post. 1, 2, 5 -> 3
 - [ ] 6 / 5 für endliche Mengen Beweis
 
-- [ ] Regel für Inverses von Produkt 
+- [x] Regel für Inverses von Produkt 
 - [ ] Potenzen 
 
 - [ ] interpretation des locales als Basis für 3 Aufgaben
-- [ ] Präsentation
+- [x] Präsentation
