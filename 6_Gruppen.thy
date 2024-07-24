@@ -96,7 +96,7 @@ locale group =
     \<Longrightarrow> (a \<otimes> b) \<in> carrier G" 
 
   and is_assoc: "\<lbrakk>a \<in> carrier G; b \<in> carrier G; c \<in> carrier G\<rbrakk> \<comment> \<open>Assoziativgesetz\<close>
-    \<Longrightarrow> mult G (mult G a b) c = mult G a (mult G b c)" \<comment> \<open>Ohne `mult` kriegen wir einen komischen Error\<close>
+    \<Longrightarrow> (a \<otimes> b) \<otimes> c = a \<otimes> (b \<otimes> c)" \<comment> \<open>Ohne `mult` kriegen wir einen komischen Error\<close>
 
   and has_identity [intro, simp]: "unit G \<in> carrier G" \<comment> \<open>Einselement\<close>
   and identity_l [simp]: "a \<in> carrier G \<Longrightarrow> e \<otimes> a = a" 
@@ -184,7 +184,7 @@ proof -
 qed
 
 lemma one_two_five_implies_three:
-  fixes c
+  fixes c x e'
   assumes one: "\<lbrakk>a \<in> carrier G; b \<in> carrier G\<rbrakk> \<Longrightarrow> (a \<otimes> b) \<in> carrier G"
     and two: "\<lbrakk>a \<in> carrier G; b \<in> carrier G; c \<in> carrier G\<rbrakk> \<Longrightarrow> mult G (mult G a b) c = mult G a (mult G b c)"
     and five_r: "\<lbrakk>a \<in> carrier G; b \<in> carrier G; mult G a x = b\<rbrakk> \<Longrightarrow> x = (inv a) \<otimes> b"
@@ -227,8 +227,36 @@ proof -
   ultimately show ?thesis by auto
 qed
 
+fun mult_upto :: "nat \<Rightarrow> 'a \<Rightarrow> 'a" where (*\<Pi>v=1..n=?. a*)
+  "mult_upto (Suc 0) a = a" |
+  "mult_upto 0 a = e" |
+  "mult_upto (Suc en) a = a \<otimes> (mult_upto en a)"
 
-end 
+definition powr :: "'a \<Rightarrow> nat \<Rightarrow> 'a" (infixr "[^]" 75) where 
+  "powr a n = mult_upto n a"
+
+(*
+lemma mult_upto_helper: 
+  fixes a::'a
+  fixes n m::nat
+  assumes "a \<in> carrier G"
+    and "(mult_upto n a) \<in> carrier G"
+    and "(mult_upto m a) \<in> carrier G"
+  shows "(mult_upto m a) \<otimes> (mult_upto n a) =  mult_upto (m+n) a"
+  sorry*)
+
+lemma powr_addition:
+  fixes a::'a
+  fixes n m::nat
+  assumes "a \<in> carrier G"
+    and a: "(a [^] n) \<in> carrier G"
+    and "(a [^] m) \<in> carrier G"
+  shows "(a [^] n) \<otimes> (a [^] m) = a [^] (n+m)" 
+  apply(induction n)
+  using powr_def assms apply(auto)
+  apply(simp add: mult_upto_helper)
+  done
+  
 (*
 lemma groupI:
   fixes G (structure)
