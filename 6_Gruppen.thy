@@ -176,8 +176,8 @@ qed
 
 lemma unit_unique:
   assumes "mult G x a = a"
-and "a \<in> carrier G"  "x \<in> carrier G"
-shows "x = unit G" using assms
+    and "a \<in> carrier G"  "x \<in> carrier G"
+shows "x = e" using assms
 proof -
   have "mult G e a = a" using has_identity assms by auto
   then have "mult G e a = mult G x a" using assms by auto
@@ -222,23 +222,25 @@ proof -
   moreover have "... = e \<otimes> (inv (a \<otimes> b))" using has_inverse inverse_l assms is_assoc help_me by auto
   moreover have "... = (inv (a \<otimes> b))" using has_identity identity_l assms by auto
   ultimately show ?thesis by auto
-
-
+qed
 
 lemma one_two_five_implies_three:
   fixes c
-  fixes d
   assumes one: "\<lbrakk>a \<in> carrier G; b \<in> carrier G\<rbrakk> \<Longrightarrow> (a \<otimes> b) \<in> carrier G"
     and two: "\<lbrakk>a \<in> carrier G; b \<in> carrier G; c \<in> carrier G\<rbrakk> \<Longrightarrow> mult G (mult G a b) c = mult G a (mult G b c)"
     and five_r: "\<lbrakk>a \<in> carrier G; b \<in> carrier G; mult G a x = b\<rbrakk> \<Longrightarrow> x = (inv a) \<otimes> b"
     and five_l: "\<lbrakk>a \<in> carrier G; b \<in> carrier G; mult G y a = b\<rbrakk> \<Longrightarrow> y = b \<otimes> (inv a)"
-    and eq_1: "c \<in> carrier G" "x \<in> carrier G"
-    and eq: "d \<otimes> c = c"
-  shows "e \<otimes> a = a"
+
+    and eq_1: "c \<in> carrier G" "x \<in> carrier G" "e' \<in> carrier G" "a \<in> carrier G"
+    and eq: "e' \<otimes> c = c"
+    and cx: "c \<otimes> x = a"
+  shows "e'\<otimes> a = a"
 proof -
-  have "d \<otimes> c = c" using eq by simp
-  from this have "d = c \<otimes> (inv c)" 
-    sorry
+  have "c \<otimes> x = a" using cx by simp
+  hence "e' \<otimes> a = e' \<otimes> (c \<otimes> x)" by auto
+  hence "e' \<otimes> a = (e' \<otimes> c) \<otimes> x"  using cx eq_1 is_assoc by simp
+  hence "e' \<otimes> a = c \<otimes> x" using eq by simp
+  thus "e' \<otimes> a = a" using cx by simp
 qed
 
 
