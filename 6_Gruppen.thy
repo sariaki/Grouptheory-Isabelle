@@ -108,6 +108,16 @@ begin
 definition is_abelian :: "bool" where
   "is_abelian = (if (\<forall>a \<in> carrier G. \<forall>b \<in> carrier G. a \<otimes> b = b \<otimes> a) then True else False)"
 
+lemma abelian_inv_r:
+  assumes abelian: "is_abelian"
+  and a: "a \<in> carrier G"
+shows "a \<otimes>(inv a) = e"
+  try
+proof -
+  from assms has_inverse inverse_l have "e = (inv a) \<otimes> a" by auto
+  also have "... = a \<otimes> (inv a)" using abelian is_abelian_def has_inverse by (meson a)
+  qed
+
 lemma inverse_r [simp]:
   assumes "a \<in> carrier G"
   shows "a \<otimes>(inv a) = e"

@@ -108,19 +108,23 @@ begin
 definition is_abelian :: "bool" where
   "is_abelian = (if (\<forall>a \<in> carrier G. \<forall>b \<in> carrier G. a \<otimes> b = b \<otimes> a) then True else False)"
 
+lemma abelian_inv_r:
+  assumes abelian: "is_abelian"
+  and a: "a \<in> carrier G"
+shows 
+
 lemma inverse_r [simp]:
   assumes "a \<in> carrier G"
   shows "a \<otimes>(inv a) = e"
   (*by (metis has_identity has_inverse identity_l inverse_l is_assoc)*)
 proof -
-  have "a \<otimes> (inv a) = a \<otimes> (inv a)" by auto
-  also have "a \<otimes> (inv a) = e \<otimes> (a \<otimes> (inv a))" using identity_l assms by auto
+  have "a \<otimes> (inv a) = e \<otimes> (a \<otimes> (inv a))" using identity_l assms by auto
   also have "... = (inv ((inv a)) \<otimes> (inv a)) \<otimes> a \<otimes> (inv a)" using inverse_l assms by auto
   also have "... = (inv (inv a)) \<otimes> e \<otimes> (inv a)" using assms has_inverse inverse_l is_assoc by metis
   also have "... = (inv (inv a)) \<otimes> (inv a)" 
     using identity_l assms has_identity has_inverse is_assoc by auto
   also have "... = e" using inverse_l assms by auto
-  ultimately show "a \<otimes>(inv a) = e". (*wtf*)
+  finally show "a \<otimes>(inv a) = e" .
 qed
 
 lemma identity_r [simp]: "a \<in> carrier G \<Longrightarrow> a \<otimes> e = a"
@@ -239,6 +243,7 @@ proof -
   ultimately show ?thesis by auto
 qed
 
+(*
 fun mult_upto :: "nat \<Rightarrow> 'a \<Rightarrow> 'a" where (*\<Pi>v=1..n=?. a*)
   "mult_upto (Suc 0) a = a" |
   "mult_upto 0 a = e" |
@@ -247,7 +252,6 @@ fun mult_upto :: "nat \<Rightarrow> 'a \<Rightarrow> 'a" where (*\<Pi>v=1..n=?. 
 definition powr :: "'a \<Rightarrow> nat \<Rightarrow> 'a" (infixr "[^]" 75) where 
   "powr a n = mult_upto n a"
 
-(*
 lemma mult_upto_helper: 
   fixes a::'a
   fixes n m::nat
@@ -255,8 +259,10 @@ lemma mult_upto_helper:
     and "(mult_upto n a) \<in> carrier G"
     and "(mult_upto m a) \<in> carrier G"
   shows "(mult_upto m a) \<otimes> (mult_upto n a) =  mult_upto (m+n) a"
-  sorry*)
+  sorry
+*)
 
+(*
 lemma powr_addition:
   fixes a::'a
   fixes n m::nat
@@ -268,6 +274,7 @@ lemma powr_addition:
   using powr_def assms apply(auto)
   apply(simp add: mult_upto_helper)
   done
+*)
   
 (*
 lemma groupI:
@@ -282,7 +289,4 @@ lemma groupI:
     and has_inverse: "x \<in> carrier G \<Longrightarrow> inverse G x \<in> carrier G"
   shows "group G"
 *)
-
-
-
 end
