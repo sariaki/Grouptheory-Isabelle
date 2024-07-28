@@ -187,7 +187,8 @@ shows "x = e" using assms
 proof -
   have "a \<otimes> e = a" using has_identity assms by auto
   then have "a \<otimes> e = a \<otimes> x" using assms by auto
-  hence "(inv a) \<otimes> a \<otimes> e = (inv a) \<otimes> a \<otimes> x" using assms has_inverse is_assoc by fastforce
+  hence "(inv a) \<otimes> a \<otimes> e = (inv a) \<otimes> a \<otimes> x"
+    using assms div_unique by blast
   hence "((inv a) \<otimes> a) \<otimes> e = ((inv a) \<otimes> a) \<otimes> x" using assms(2) assms(3) is_assoc by simp
   hence "e \<otimes> e = e \<otimes> x" using assms inverse_l by simp
   thus "x = e" using identity_l has_identity assms by auto
