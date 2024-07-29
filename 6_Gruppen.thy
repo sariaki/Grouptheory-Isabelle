@@ -112,7 +112,6 @@ lemma abelian_inv_r:
   assumes abelian: "is_abelian"
   and a: "a \<in> carrier G"
 shows "a \<otimes>(inv a) = e"
-  try
 proof -
   from assms has_inverse inverse_l have "e = (inv a) \<otimes> a" by auto
   also have "... = a \<otimes> (inv a)"

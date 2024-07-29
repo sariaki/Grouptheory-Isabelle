@@ -115,13 +115,14 @@ shows "a \<otimes>(inv a) = e"
   try
 proof -
   from assms has_inverse inverse_l have "e = (inv a) \<otimes> a" by auto
-  also have "... = a \<otimes> (inv a)" using abelian is_abelian_def has_inverse by (meson a)
-  qed
+  also have "... = a \<otimes> (inv a)"
+    using abelian is_abelian_def has_inverse a by meson
+  ultimately show "... = e" using inverse_l by auto
+qed
 
 lemma inverse_r [simp]:
   assumes "a \<in> carrier G"
   shows "a \<otimes>(inv a) = e"
-  (*by (metis has_identity has_inverse identity_l inverse_l is_assoc)*)
 proof -
   have "a \<otimes> (inv a) = e \<otimes> (a \<otimes> (inv a))" using identity_l assms by auto
   also have "... = (inv ((inv a)) \<otimes> (inv a)) \<otimes> a \<otimes> (inv a)" using inverse_l assms by auto
