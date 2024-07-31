@@ -168,16 +168,26 @@ proof -
 qed
 
 text \<open>Postulat 6.\<close>
-lemma div_unique [simp]:
+lemma div_unique_r [simp]:
   assumes "a \<otimes> x = a \<otimes> x'" 
     and "a \<in> carrier G"  "x \<in> carrier G"  "x' \<in> carrier G"
   shows "x = x'" using assms
 proof -
-  from assms have "mult G a x = mult G a x'" by auto
+  from assms have "a \<otimes> x = a \<otimes> x'" by auto
   hence "(inv a) \<otimes> a \<otimes> x = (inv a) \<otimes> a \<otimes> x'" 
     using assms has_inverse is_assoc by metis
   hence "e \<otimes> x = e \<otimes> x'" using assms by auto
   then show "x = x'" using assms identity_l by auto
+qed
+
+lemma div_unique_l [simp]:
+  assumes "x \<otimes> a = x' \<otimes> a"
+and "a \<in> carrier G"  "x \<in> carrier G"  "x' \<in> carrier G"
+shows "x = x'" using assms
+proof -
+  from assms have "x \<otimes> a \<otimes> (inv a) = x' \<otimes> a \<otimes> (inv a)" using has_inverse is_assoc by metis
+  hence "x \<otimes> e = x' \<otimes> e" using is_assoc assms inverse_r has_identity has_inverse by metis
+  thus "x = x'" using identity_r assms by simp
 qed
 
 lemma unit_unique:
@@ -185,13 +195,13 @@ lemma unit_unique:
 and "a \<in> carrier G" "x \<in> carrier G" 
 shows "x = e" using assms
 proof -
-  have "a \<otimes> e = a" using has_identity assms by auto
-  then have "a \<otimes> e = a \<otimes> x" using assms by auto
+  have "a \<otimes> e = a" using has_identity assms by 
+  then have "a \<otimes> e = a \<otimes> x" using assms by 
   hence "(inv a) \<otimes> a \<otimes> e = (inv a) \<otimes> a \<otimes> x"
-    using assms div_unique by blast
-  hence "((inv a) \<otimes> a) \<otimes> e = ((inv a) \<otimes> a) \<otimes> x" using assms(2) assms(3) is_assoc by simp
-  hence "e \<otimes> e = e \<otimes> x" using assms inverse_l by simp
-  thus "x = e" using identity_l has_identity assms by auto
+    using assms div_unique_r by 
+  hence "((inv a) \<otimes> a) \<otimes> e = ((inv a) \<otimes> a) \<otimes> x" using assms(2) assms(3) is_assoc by 
+  hence "e \<otimes> e = e \<otimes> x" using assms inverse_l by 
+  thus "x = e" using identity_l has_identity assms by
 qed
 
 lemma inv_unique:
