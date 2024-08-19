@@ -1,2 +1,0 @@
-- `inverse_r` Beweis
-- sollten die in der Aufgabenstellung erwähnten Einheitselemente nicht inverse Elemente sein?
