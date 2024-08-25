@@ -1,4 +1,4 @@
-theory "6_Gruppen"
+theory "Gruppen"
 
 imports "HOL-Algebra.Congruence" "HOL-Library.FuncSet"
 
