@@ -7,7 +7,7 @@ Our formalization ended up being something in between the two existing definitio
 The Product presented is thus more compact, but lacks some of the features of the other existing formalizations - namely powers, subgroups and homo-/isomorphisms. 
 
 ### Documentation:
-Documentation and a gentle introduction to group theory can be found at github.com/sariaki/Grouptheory-Docs/main.
+Documentation and a gentle introduction to group theory can be found at github.com/sariaki/Grouptheory-Docs/main. (to be released)
 
 ### Credits:
 - [Paul B.](https://github.com/sariaki) 
